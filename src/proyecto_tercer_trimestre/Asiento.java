@@ -5,7 +5,9 @@
  */
 package proyecto_tercer_trimestre;
 import datos.*;
+import validar.*;
 import java.sql.*;
+import javax.swing.JOptionPane;
 import metodo.conectar;
 /**
  *
@@ -48,6 +50,11 @@ public class Asiento extends javax.swing.JFrame {
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "A", "B", "C", "D", "E", "F" }));
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
         jPanel1.add(jComboBox1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 320, 50, 30));
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "01", "02", "03", "04", "07", "08", "10", "11", "12", "13", "14", "15", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38" }));
@@ -107,24 +114,81 @@ public class Asiento extends javax.swing.JFrame {
         // TODO add your handling code here:
     String fila = (String) jComboBox2.getSelectedItem();
     String asiento = (String) jComboBox1.getSelectedItem();
-      
+         
     datos da=new datos();
     String DNI=da.getDNI();
-   
+   String codigo=da.getCodigo();
+    
+    
+    int seleccion = jComboBox2.getSelectedIndex();
+        if(seleccion<4){
+            String clase="Bussiness";
+            da.setClase(clase);
+            int incremento=120;
+            String precioini = da.getPrecio();
+            String precioremplazado = precioini.replace("€", "");
+            int precioinicial=Integer.parseInt(precioremplazado);            
+            int preciofinal=incremento+precioinicial;            
+            String preciodef=String.valueOf(preciofinal)+"€";            
+            da.setPrecio(preciodef);
+            
+        }else{
+            String clase="Turista";
+            da.setClase(clase);
+        } 
+        
+        String precio=da.getPrecio();
+        String clase=da.getClase();
+        
    Connection conn=null;
    conectar con= new conectar(); 
    conn=con.getConnection();
         try{
      Statement st=conn.createStatement();
      String billete="update Billetes set Asiento='"+fila+asiento+"' where DNI='"+DNI+"'";
+      String incodigo="update Billetes set Codigo_Vuelo='"+codigo+"' where DNI='"+DNI+"'";
+      String inclase="update Billetes set Clase='"+clase+"' where DNI='"+DNI+"'"; 
+       String inprecio="update Billetes set Precio_Final='"+precio+"' where DNI='"+DNI+"'";
       st.executeUpdate(billete);
-      System.out.println("Se ha creado el nuevo registro");
+      st.executeUpdate(incodigo);
+      st.executeUpdate(inclase);
+      st.executeUpdate(inprecio);
+      System.out.println("Se ha creado la nueva compra");
         }catch(Exception e){
             System.out.println("Error creando el registro: "+e);
         }
+        int numbilletes=da.getnumBilletes();
         
+        for(int i=0; numbilletes<i;i++){
+            this.setVisible(false);
+            Billetes_Personas bill=new Billetes_Personas();
+            bill.setVisible(true);
+        }
+                
         
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+        String fila = (String) jComboBox2.getSelectedItem();
+        String asiento = (String) jComboBox1.getSelectedItem();
+        String asientoesc=fila+asiento;
+        
+        validar val=new validar();
+        val.setValido(asientoesc);
+        String validacion=val.getValido();
+        System.out.println(validacion);
+        while(validacion.equals("Ocupado")){
+            
+            JOptionPane.showMessageDialog(null,"Asiento ocupado, por favor escoga otro asiento para continuar");
+            fila = (String) jComboBox2.getSelectedItem();
+         asiento = (String) jComboBox1.getSelectedItem();
+        asientoesc=fila+asiento;
+            val.setValido(asientoesc);
+         validacion=val.getValido();
+        }
+        
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * @param args the command line arguments

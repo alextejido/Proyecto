@@ -159,7 +159,8 @@ public class ComprarBilletes extends javax.swing.JFrame {
 
                 datos da = new datos();
                 da.setDatos(id, origen, destino, aerolinea, fecha, hora, precio);
-                
+                da.setCodigo(id);
+                da.setPrecio(precio);
 
             }
         } catch (Exception e) {
