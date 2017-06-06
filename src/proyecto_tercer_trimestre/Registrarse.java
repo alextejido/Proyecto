@@ -135,7 +135,8 @@ public class Registrarse extends javax.swing.JFrame {
         }catch(Exception e){
             System.out.println("Error creando el registro: "+e);
         }
-    
+    Interfaz_PrincipalLogeado inte = new Interfaz_PrincipalLogeado();
+    inte.setVisible(true);
       dispose();
         
     }//GEN-LAST:event_jButton2ActionPerformed

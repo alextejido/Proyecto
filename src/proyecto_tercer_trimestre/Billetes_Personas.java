@@ -5,6 +5,11 @@
  */
 package proyecto_tercer_trimestre;
 
+import datos.datos;
+import java.sql.*;
+import javax.swing.ButtonModel;
+import metodo.*;
+
 /**
  *
  * @author artur
@@ -94,7 +99,7 @@ public class Billetes_Personas extends javax.swing.JFrame {
 
         buttonGroup1.add(Radio_Hombre);
         Radio_Hombre.setText("Hombre");
-        jPanel1.add(Radio_Hombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, -1, -1));
+        jPanel1.add(Radio_Hombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, -1, -1));
 
         buttonGroup1.add(Radio_Mujer);
         Radio_Mujer.setText("Mujer");
@@ -103,18 +108,23 @@ public class Billetes_Personas extends javax.swing.JFrame {
                 Radio_MujerActionPerformed(evt);
             }
         });
-        jPanel1.add(Radio_Mujer, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 50, -1, -1));
+        jPanel1.add(Radio_Mujer, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 50, -1, -1));
 
         Dia.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31" }));
         jPanel1.add(Dia, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 350, -1, -1));
 
-        Mes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" }));
-        jPanel1.add(Mes, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 350, 60, -1));
+        Mes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12" }));
+        jPanel1.add(Mes, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 350, 50, -1));
 
         Año.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "--", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002", "2001", "2000", "1999", "1998", "1997", "1996", "1995", "1994", "1993", "1992", "1991", "1990", "1989", "1988", "1987", "1986", "1985", "1984", "1983", "1982", "1981", "1980", "1979", "1978", "1977", "1976", "1975", "1974", "1973", "1972", "1971", "1970", "1969", "1968", "1967", "1966", "1965", "1964", "1963", "1962", "1961", "1960", "1959", "1958", "1957", "1956", "1955", "1954", "1953", "1952", "1951", "1950", "1949", "1948", "1947", "1946", "1945", "1944", "1943", "1942", "1941", "1940", "1939", "1938", "1937", "1936", "1935", "1934", "1933", "1932", "1931", "1930", "1929", "1928", "1927", "1926", "1925", "1924", "1923", "1922", "1921", "1920", "1919", "1918", "1917" }));
-        jPanel1.add(Año, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 350, -1, -1));
+        jPanel1.add(Año, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 350, -1, -1));
 
         Boton_Siguiente.setText("Siguiente paso");
+        Boton_Siguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Boton_SiguienteActionPerformed(evt);
+            }
+        });
         jPanel1.add(Boton_Siguiente, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 400, -1, -1));
         jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 450, 10));
 
@@ -139,6 +149,56 @@ public class Billetes_Personas extends javax.swing.JFrame {
     private void Radio_MujerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Radio_MujerActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_Radio_MujerActionPerformed
+
+    private void Boton_SiguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Boton_SiguienteActionPerformed
+        // TODO add your handling code here:
+    String sexo;
+    boolean seleccionado=Radio_Hombre.isSelected();
+       
+    if(seleccionado==true){
+           sexo="Hombre";
+       }else{
+        sexo="Mujer";
+    }
+        
+         
+    String nombre=jText_Nombre.getText();
+    String papellido=jText_Apellido1.getText();    
+    String sapellido=jText_Apellido2.getText();    
+    String dni=jTextDNI.getText();    
+    String nacionalidad=jText_Nacionalidad.getText();
+    
+    int d=Dia.getSelectedIndex();
+    String dia=Dia.getItemAt(d);
+    
+    int m=Mes.getSelectedIndex();
+    String mes=Mes.getItemAt(m);
+    
+    int a=Año.getSelectedIndex();
+    String año=Año.getItemAt(a);
+    
+    String fecha=dia+"/"+mes+"/"+año;
+    System.out.println(fecha);
+    
+     Connection conn=null;
+   conectar con= new conectar(); 
+   conn=con.getConnection();
+        try{
+     Statement st=conn.createStatement();
+     String billete="insert into Billetes(DNI,Nombre,Primer_Apellido,Segundo_Apellido,Nacionalidad,Sexo,Fecha_de_nacimiento)values('"+dni+"','"+nombre+"','"+papellido+"','"+sapellido+"','"+nacionalidad+"','"+sexo+"','"+fecha+"')";
+      st.executeUpdate(billete);
+      System.out.println("Se ha creado el nuevo registro");
+      datos da=new datos();
+      da.setDNI(dni);
+        }catch(Exception e){
+            System.out.println("Error creando el registro: "+e);
+        }
+        
+        this.setVisible(false);
+        Asiento asi=new Asiento();
+        asi.setVisible(true);
+       
+    }//GEN-LAST:event_Boton_SiguienteActionPerformed
 
     /**
      * @param args the command line arguments

@@ -5,12 +5,18 @@
  */
 package proyecto_tercer_trimestre;
 
+import datos.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import metodo.conectar;
+
 /**
  *
  * @author artur
@@ -20,23 +26,20 @@ public class ComprarBilletes extends javax.swing.JFrame {
     /**
      * Creates new form ComprarBilletes
      */
-    
     public ComprarBilletes() {
         initComponents();
-        
-  Calendar min = Calendar.getInstance();        
-  min.set(Calendar.YEAR,2017);  
-min.set(Calendar.MONTH,5);  
-min.set(Calendar.DATE,12);  
- dateChooserPanel1.setMinDate(min);  
-         Calendar max = Calendar.getInstance();        
-  max.set(Calendar.YEAR,2017);  
-max.set(Calendar.MONTH,6);  
-max.set(Calendar.DATE,13);  
- dateChooserPanel1.setMaxDate(max);
-        
-        
-       
+
+        Calendar min = Calendar.getInstance();
+        min.set(Calendar.YEAR, 2017);
+        min.set(Calendar.MONTH, 5);
+        min.set(Calendar.DATE, 11);
+        dateChooserPanel1.setMinDate(min);
+        Calendar max = Calendar.getInstance();
+        max.set(Calendar.YEAR, 2017);
+        max.set(Calendar.MONTH, 6);
+        max.set(Calendar.DATE, 13);
+        dateChooserPanel1.setMaxDate(max);
+
     }
 
     /**
@@ -63,10 +66,20 @@ max.set(Calendar.DATE,13);
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        Origen_Combo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        Origen_Combo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Vigo", "Barcelona", "Santander", "Madrid", "Sevilla", "Pamplona", "Valencia", "Bilbao", "Albacete", "Zaragoza", "Murcia", "Oviedo", "Tenerife", "Palma de Mallorca", "Badajoz", "Mérida", "Logroño" }));
+        Origen_Combo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Origen_ComboActionPerformed(evt);
+            }
+        });
         jPanel1.add(Origen_Combo, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 50, 110, 40));
 
-        Destino_Combo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        Destino_Combo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Vigo", "Barcelona", "Santander", "Madrid", "Sevilla", "Pamplona", "Valencia", "Bilbao", "Albacete", "Zaragoza", "Murcia", "Oviedo", "Tenerife", "Palma de Mallorca", "Badajoz", "Mérida", "Logroño" }));
+        Destino_Combo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Destino_ComboActionPerformed(evt);
+            }
+        });
         jPanel1.add(Destino_Combo, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 50, 110, 40));
 
         Origen_Text.setFont(new java.awt.Font("Tahoma", 1, 24)); // NOI18N
@@ -111,13 +124,75 @@ max.set(Calendar.DATE,13);
 
     private void Siguiente_BotonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Siguiente_BotonActionPerformed
         // TODO add your handling code here:
-        Iterable seleccion=dateChooserPanel1.getSelection();
-        String dia=String.valueOf(seleccion);
-        System.out.println(dia);
+        Iterable seleccion = dateChooserPanel1.getSelection();
+        String dia = String.valueOf(seleccion);
 
-		String diaremplazado=dia.replace("[", "").replace("]","");
-                 System.out.println(diaremplazado);
+        //hacer libreria
+        String diaremplazado = dia.replace("[", "").replace("]", "");
+        StringBuffer sb = new StringBuffer(diaremplazado);
+        sb.insert(6, "20");
+        //hasta aqui
+
+        String selorigen = (String) Origen_Combo.getSelectedItem();
+
+        String seldestino = (String) Destino_Combo.getSelectedItem();
+
+        Connection conn = null;
+        conectar con = new conectar();
+        conn = con.getConnection();
+
+        try {
+
+            String vuelo = "SELECT * from Vuelos where Origen='" + selorigen + "' and Destino='" + seldestino + "' and Fecha_Salida='" + sb + "'";
+
+            Statement st = conn.createStatement();
+            ResultSet vue = st.executeQuery(vuelo);
+
+            while (vue.next()) {
+                String id = vue.getString("Id");
+                String origen = vue.getString("Origen");
+                String destino = vue.getString("Destino");
+                String aerolinea = vue.getString("Aerolinea");
+                String fecha = vue.getString("Fecha_Salida");
+                String hora = vue.getString("Hora_Salida");
+                String precio = vue.getString("Precio") + "€";
+
+                datos da = new datos();
+                da.setDatos(id, origen, destino, aerolinea, fecha, hora, precio);
+                
+
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error " + e);
+        }
+
+        String bi = Billetes_Field.getText();
+        int billetes = Integer.parseInt(bi);
+        datos da = new datos();
+        da.setnumBilletes(billetes);
+
+        Interfaz_Datos inte = new Interfaz_Datos();
+        inte.setVisible(true);
+        this.setVisible(false);
+
+
     }//GEN-LAST:event_Siguiente_BotonActionPerformed
+
+    private void Origen_ComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Origen_ComboActionPerformed
+        // TODO add your handling code here:
+        int seleccion = Origen_Combo.getSelectedIndex();
+        if (seleccion > 1) {
+            Destino_Combo.setSelectedIndex(0);
+        }
+    }//GEN-LAST:event_Origen_ComboActionPerformed
+
+    private void Destino_ComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Destino_ComboActionPerformed
+        // TODO add your handling code here:
+        int seleccion = Destino_Combo.getSelectedIndex();
+        if (seleccion > 1) {
+            Origen_Combo.setSelectedIndex(0);
+        }
+    }//GEN-LAST:event_Destino_ComboActionPerformed
 
     /**
      * @param args the command line arguments
